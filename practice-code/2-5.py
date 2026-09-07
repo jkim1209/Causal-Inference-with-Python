@@ -50,7 +50,7 @@ plt.legend()
 exp_se = short_email.sem()
 exp_mu = short_email.mean()
 ci95 = (exp_mu - 2 * exp_se, exp_mu + 2 * exp_se)
-print("95% CI for short email: ", ci)
+print("95% CI for short email: ", ci95)
 
 x = np.linspace(exp_mu - 4*exp_se, exp_mu + 4*exp_se, 100)
 y = stats.norm.pdf(x, exp_mu, exp_se)
@@ -155,4 +155,3 @@ t_stat
 np.ceil(16*(no_email.std()/0.08)**2)
 
 data.groupby("cross_sell_email").size()
-# %%
