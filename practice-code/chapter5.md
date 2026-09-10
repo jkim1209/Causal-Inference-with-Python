@@ -25,10 +25,9 @@ smf.ols("engagement_score ~ intervention", data=df).fit().summary().tables[1]
 
 **🔍 왜 이 계수가 "두 집단의 평균 차이"와 같은지**
 
-`intervention`은 0 또는 1만 갖는 더미변수입니다. 단순선형회귀 $Y = \beta_0 + \beta_1 T$에서, $T=0$일 때 예측값은 $\beta_0$, $T=1$일 때 예측값은 $\beta_0+\beta_1$입니다. OLS는 각 집단 내에서 예측오차 제곱합을 최소화하도록 적합되므로, 결과적으로 $\beta_0 = \bar{Y}*{T=0}$(비교군 평균), $\beta_0+\beta_1 = \bar{Y}*{T=1}$(처치군 평균)이 됩니다. 따라서:
-
+`intervention`은 0 또는 1만 갖는 더미변수입니다. 단순선형회귀 $Y = \beta_0 + \beta_1 T$에서, $T=0$일 때 예측값은 $\beta_0$, $T=1$일 때 예측값은 $\beta_0+\beta_1$입니다. OLS는 각 집단 내에서 예측오차 제곱합을 최소화하도록 적합되므로, 결과적으로 $\beta_0 = \bar{Y}_{T=0}$(비교군 평균), $\beta_0+\beta_1 = \bar{Y}_{T=1}$(처치군 평균)이 됩니다. 따라서:
 $$
- \beta_1 = \bar{Y}*{T=1} - \bar{Y}*{T=0}
+\beta_1 = \bar{Y}_{T=1} - \bar{Y}_{T=0}
 $$
 
 즉 회귀계수 $\beta_1$이 곧 두 집단의 평균 차이입니다.
@@ -209,16 +208,18 @@ y0 = sum(t0*weight_nt)/len(data_ps)
 **🔍 왜 이 계산이 $E[Y_1]$을 추정하는지**
 
 $$
- E[Y_1] = E\left[\frac{T \cdot Y}{e(X)}\right]
+E[Y_1] = E\left[\frac{T \cdot Y}{e(X)}\right]
 $$
 
 $T$가 0/1이므로 $T=0$인 사람은 항 전체가 0이 되어 기여하지 않고, $T=1$인 사람만 $Y/e(X)$로 남습니다. 조건부기댓값 반복법칙을 쓰면:
 
 $$
- E\left[\frac{T \cdot Y}{e(X)}\right] = E\left[E\left[\frac{T \cdot Y}{e(X)} ,\Big|, X\right]\right] = E\left[\frac{e(X)\cdot E[Y\mid X, T=1]}{e(X)}\right] = E[E[Y\mid X, T=1]] = E[Y_1]
+E\left[\frac{T \cdot Y}{e(X)}\right] = E\left[E\left[\frac{T \cdot Y}{e(X)} \,\Big|\, X\right]\right] = E\left[\frac{e(X)\cdot E[Y\mid X, T=1]}{e(X)}\right] = E[E[Y\mid X, T=1]] = E[Y_1]
 $$
 
-(unconfoundedness 가정 하에 $E[Y\mid X,T=1] = E[Y_1\mid X]$이므로 마지막 등호 성립) — $e(X)$로 나눠주는 게 "이 사람이 뽑힐 확률이 낮았던 만큼 더 크게 쳐준다"는 보정 역할을 해서, 표본평균이 모집단 평균의 불편추정량이 되게 합니다.
+(두 번째 등호: $X$가 주어지면 $e(X)$는 상수이고, $T\cdot Y$는 $T=1$일 때만 $Y$로 남으므로 $E[T\cdot Y\mid X]=e(X)\cdot E[Y\mid X,T=1]$. 이걸 $e(X)$로 나누면 네 번째 항이 됨. unconfoundedness 가정 하에 $E[Y\mid X,T=1] = E[Y_1\mid X]$이므로 마지막 등호가 성립.)
+
+$e(X)$로 나눠주는 게 "이 사람이 뽑힐 확률이 낮았던 만큼 더 크게 쳐준다"는 보정 역할을 해서, 표본평균이 모집단 평균의 불편추정량이 되게 합니다.
 
 ```python
 print("E[Y1]: ", y1)
@@ -242,10 +243,10 @@ np.mean(data_ps["engagement_score"]
 
 **🔍 블록 7과 같은 값이 나오는 이유**
 
-$T=1$일 때: $\dfrac{Y(1-e(X))}{e(X)(1-e(X))} = \dfrac{Y}{e(X)}$, $T=0$일 때: $\dfrac{Y(0-e(X))}{e(X)(1-e(X))} = \dfrac{-Y}{1-e(X)}$이므로:
+$T=1$일 때 $\dfrac{Y(1-e(X))}{e(X)(1-e(X))} = \dfrac{Y}{e(X)}$, $T=0$일 때 $\dfrac{Y(0-e(X))}{e(X)(1-e(X))} = \dfrac{-Y}{1-e(X)}$이므로
 
 $$
- \frac{T-e(X)}{e(X)(1-e(X))}\cdot Y = \frac{T}{e(X)}\cdot Y - \frac{1-T}{1-e(X)}\cdot Y
+\frac{T-e(X)}{e(X)(1-e(X))}\cdot Y = \frac{T}{e(X)}\cdot Y - \frac{1-T}{1-e(X)}\cdot Y
 $$
 
 즉 처치군에서는 $Y/e(X)$를 더하고, 비교군에서는 $Y/(1-e(X))$를 뺀다는 뜻 — 블록 7의 $\hat{E}[Y_1]-\hat{E}[Y_0]$와 동일한 계산.
