@@ -379,11 +379,11 @@ $E[e(X)] \approx P(T=1)$이므로 $\dfrac{P(T=1)}{e(X)}$는 평균적으로 1 �
 print("Treat size:", len(t1))
 print("W treat", sum(weight_t_stable))
 
-print("Treat size:", len(t0))
+print("Control size:", len(t0))
 print("W treat", sum(weight_nt_stable))
 ```
 
-- 각 그룹 크기와 안정화 가중치 합 출력. (두 번째 출력의 "Treat size" 라벨은 실제로는 비교군 크기 — 원본 코드의 복붙 오타로 보임.)
+- 각 그룹 크기와 안정화 가중치 합 출력.
 
 ------
 
